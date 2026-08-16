@@ -1,3 +1,7 @@
+import csv
+import json
+from validar_productos import validar_datos
+
 #productos = [
 #    {"nombre": "Laptop", "precio": 1200, "stock": 15},
 #    {"nombre": "Mouse", "precio": 25, "stock": 5},
@@ -28,8 +32,9 @@
 #precio_promedio = calcular_promedio_precio(productos)
 #print(f"\n El precio promedio de los productos es: ${precio_promedio:.2f}")  # Salida: El precio promedio de los productos es: $400.00
 
-import csv
 
+
+# Creo la variable productos_desde_csv para almacenar los productos leídos desde el archivo CSV
 productos_desde_csv = []
 
 with open('datos.csv', mode='r', encoding = 'utf-8') as archivo_csv:
@@ -45,4 +50,14 @@ print("\n Productos desde el archivo CSV:")
 print(productos_desde_csv)  # Salida: [{'id': 1, 'nombre': 'Laptop', 'precio': 1200.0, 'stock': 15}, {'id': 2, 'nombre': 'Mouse', 'precio': 25.0, 'stock': 5}, {'id': 3, 'nombre': 'Teclado', 'precio': 75.0, 'stock': 25}, {'id': 4, 'nombre': 'Monitor', 'precio': 300.0, 'stock': 8}]
 
 
+# Convierto la lista de productos a formato JSON y la guardo en el archivo salida.json
+datos_json = json.dumps(productos_desde_csv, indent=4)
 
+with open('salida.json', 'w') as archivo_salida:
+    archivo_salida.write(datos_json)
+
+
+    
+
+validar_datos('salida.json')
+            
