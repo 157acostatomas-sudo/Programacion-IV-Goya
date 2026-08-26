@@ -17,3 +17,4 @@ def validar_datos(archivo_recibido):
     except (ValueError, TypeError) as e:
         print(f"Error en la validación: {e}")
         return None
+    
