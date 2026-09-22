@@ -1,7 +1,8 @@
+from django.urls import path
 from . import views
-from django.urls import path, include
 
 urlpatterns = [
-    path("estado/", views.health_check, name="health_check"),
-    #$path("api/", include("core.url")),
+    path("health/", views.health_check, name="health_check"),
+    path("projects/", views.project_list, name="project_list"),
+    path("tasks/", views.task_list, name="task_list"),
 ]

@@ -60,4 +60,4 @@ with open('salida.json', 'w') as archivo_salida:
     
 
 validar_datos('salida.json')
-            
+    

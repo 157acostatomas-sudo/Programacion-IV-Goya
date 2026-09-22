@@ -2,14 +2,23 @@
 import csv
 import json
 import xml.etree.ElementTree as ET
+import logging
+
 
 # BaseCommand es la clase que Django exige heredar para que este script
 # cuente como un comando personalizado de manage.py.
 from django.core.management.base import BaseCommand
 
 # Importamos el modelo Task donde guardaremos los datos en la base de datos.
-from core.models import Task
+from core.models import Project, Task
 
+
+logging.basicConfig(
+    filename = "import.log",
+    level = logging.WARNING, 
+    format = "%(asctime)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     # El atributo help proporciona una descripción corta que se muestra
@@ -19,6 +28,11 @@ class Command(BaseCommand):
     # El método handle es el punto de entrada. Es el código que se ejecuta
     # automáticamente cuando corremos el comando en la terminal.
     def handle(self, *args, **options):
+
+        self.project, _ = Project.objects.get_or_create(name = "Importacion de datos (Clase 2)"
+            )
+
+
         total = 0  # Inicializamos un contador para el total de tareas importadas con éxito.
         
         # Llamamos a los submétodos para cada tipo de archivo y sumamos los resultados.
@@ -27,6 +41,7 @@ class Command(BaseCommand):
         total += self._import_json("data/tasks_provider_a.json", source="proveedor_a")
         total += self._import_csv("data/tasks_provider_b.csv", source="proveedor_b")
         total += self._import_xml("data/tasks_provider_c.xml", source="proveedor_c")
+        total += self._import_json("data/tasks_provider_d.json", source="proveedor_d")
         
         # self.stdout.write y self.style.SUCCESS imprimen un mensaje de éxito en la consola.
         self.stdout.write(self.style.SUCCESS(f"Importación finalizada: {total} tareas cargadas"))
@@ -48,8 +63,11 @@ class Command(BaseCommand):
         # Atrapamos errores si el archivo no existe o el JSON está mal formateado.
         except (FileNotFoundError, json.JSONDecodeError) as e:
             # self.stderr.write imprime errores en la consola (generalmente en color rojo).
-            self.stderr.write(self.style.ERROR(f"Error importando {path}: {e}"))
             
+            #self.stderr.write(self.style.ERROR(f"Error importando {path}: {e}"))
+            logger.error(f"Error importando {path}: {e}")
+            
+
         return count  # Devolvemos cuántas tareas se importaron exitosamente de este archivo.
 
     def _import_csv(self, path, source):
@@ -64,7 +82,8 @@ class Command(BaseCommand):
                     self._crear_task(row, source)
                     count += 1
         except FileNotFoundError as e:
-            self.stderr.write(self.style.ERROR(f"Error importando {path}: {e}"))
+            #self.stderr.write(self.style.ERROR(f"Error importando {path}: {e}"))
+            logger.error(f"Error importando {path}: {e}")
         return count
 
     def _import_xml(self, path, source):
@@ -87,22 +106,24 @@ class Command(BaseCommand):
                 
         # Atrapamos errores si el archivo no existe o el XML está corrupto (ParseError).
         except (FileNotFoundError, ET.ParseError) as e:
-            self.stderr.write(self.style.ERROR(f"Error importando {path}: {e}"))
+            #self.stderr.write(self.style.ERROR(f"Error importando {path}: {e}"))
+            logger.error(f"Error importando {path}: {e}")
         return count
 
     def _crear_task(self, item, source):
         # Validación sencilla: si el diccionario no tiene título, informamos el error y lo ignoramos.
         if not item.get("title"):
-            self.stderr.write(self.style.WARNING("Item sin título, se ignora"))
+            #self.stderr.write(self.style.WARNING("Item sin título, se ignora"))
+            logger.warning("Item sin título, se ignora")
             return
         
         # Task.objects.create(...) es la forma en que el ORM de Django crea e inserta
         # una nueva fila en la tabla Task de la base de datos, sin tener que escribir SQL manual.
         Task.objects.create(
+            project=self.project,
             title=item["title"],
             # Usamos el método .get("clave", "valor_por_defecto") de los diccionarios. 
             # Si el proveedor no envió 'priority' o 'status', se asigna 'media' y 'pendiente'.
             priority=item.get("priority", "media"),
             status=item.get("status", "pendiente"),
-            source=source,
         )
