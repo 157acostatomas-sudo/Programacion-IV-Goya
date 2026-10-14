@@ -21,13 +21,30 @@ class TaskSerializer(serializers.ModelSerializer):
         if value and value < date.today():
             raise serializers.ValidationError("La fecha límite no puede ser en el pasado.")
         return value
- 
+    
     def validate(self, data):
-        # Validación que involucra más de un campo
-        if data.get("status") == "completada" and not data.get("due_date"):
+        # En un PATCH, "data" trae solo los campos enviados: lo que falte
+        # lo tomamos de la tarea que ya existe (self.instance).
+        instance = self.instance
+        status = data.get("status", instance.status if instance else None)
+        due_date = data.get("due_date", instance.due_date if instance else None)
+        project = data.get("project", instance.project if instance else None)
+
+        # Regla ya existente (de antes)
+        if status == "completada" and not due_date:
             raise serializers.ValidationError(
                 "No se puede marcar una tarea como completada sin fecha límite registrada."
             )
+
+        # Tarea nueva de hoy
+        if status == "en_progreso":
+            hay_completadas = project.tasks.filter(status="completada").exists()
+            if not hay_completadas:
+                raise serializers.ValidationError(
+                    "No se puede pasar a 'en_progreso' una tarea de un proyecto "
+                    "que todavía no tiene ninguna tarea completada."
+                )
+
         return data
 
 

@@ -1,0 +1,38 @@
+CASO 200
+Comando: curl -i http://127.0.0.1:8000/api/tasks/20/
+Primera línea: HTTP/1.1 200 OK
+Cuerpo: {"id":20,"project":1,"title":"Redactar README","description":"","priority":"baja","status":"pendiente","due_date":null,"tags":[],"created_at":"2026-09-22T16:06:18.828030Z"}
+Observación: GET sobre una tarea existente.
+
+CASO 201
+Comando: curl -i -X POST http://127.0.0.1:8000/api/tasks/ -H "Content-Type: application/json" -d '{"project": 1, "title": "prueba1-generacionAutomatica"}'
+Primera línea: HTTP/1.1 201 Created
+Cuerpo: {"id":26,"project":1,"title":"prueba1-generacionAutomatica","description":"","priority":"media","status":"pendiente","due_date":null,"tags":[],"created_at":"2026-10-14T16:25:44.657397Z"}
+Observación: creación correcta de una tarea nueva.
+
+CASO 204
+Comando: curl -i -X DELETE http://127.0.0.1:8000/api/tasks/25/
+Primera línea: HTTP/1.1 204 No Content
+Cuerpo: (vacío)
+Observación: borrado exitoso, sin cuerpo de respuesta.
+
+CASO 400
+Comando: curl -i -X POST http://127.0.0.1:8000/api/tasks/ -H "Content-Type: application/json" -d '{"project": 1}'
+Primera línea: HTTP/1.1 400 Bad Request
+Cuerpo: {"error":true,"detail":{"title":["This field is required."]}}
+Observación: falta el campo obligatorio "title"; el error viene envuelto por nuestro custom_exception_handler.
+
+CASO 404
+Comando: curl -i http://127.0.0.1:8000/api/tasks/999/
+Primera línea: HTTP/1.1 404 Not Found
+Cuerpo: {"error":true,"detail":{"detail":"No Task matches the given query."}}
+Observación: el mensaje viene envuelto por nuestro custom_exception_handler.
+
+CASO 500
+Comando: curl -i http://127.0.0.1:8000/api/tasks/romper/
+Primera línea: HTTP/1.1 500 Internal Server Error
+Cuerpo: {"error":true,"detail":"Error interno del servidor."}
+Observación: forzado a propósito con un @action temporal ("romper") que hacía 1/0, solo para la prueba. Se elimina antes de subir.
+
+CASO 401 / 403
+Observación: pendiente, Clase 6.
