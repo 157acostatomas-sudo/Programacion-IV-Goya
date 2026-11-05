@@ -6,6 +6,7 @@ from .models import Project
 from .repositories import TaskRepository
 from .serializers import ProjectSerializer, TaskSerializer
 from .services import TaskService
+from .services import TaskService, ProjectService
 
 def health_check(request):
     return JsonResponse({"status": "ok", "service": "TaskFlow API"})
@@ -13,6 +14,11 @@ def health_check(request):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all().order_by("id")
     serializer_class = ProjectSerializer
+
+    @action(detail=True, methods=["get"])
+    def summary(self, request, pk=None):
+        project = self.get_object()
+        return Response(ProjectService.project_summary(project))
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = TaskRepository.get_queryset()

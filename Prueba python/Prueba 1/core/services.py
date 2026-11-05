@@ -4,6 +4,8 @@ from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from .models import Task
 from .repositories import TaskRepository
+from django.db.models import Count
+
 
 class TaskService:
     @staticmethod
@@ -48,3 +50,12 @@ class HolidayService:
     @classmethod
     def is_holiday(cls, some_date) -> bool:
         return str(some_date) in cls.get_holidays(some_date.year)
+
+class ProjectService:
+    @staticmethod
+    def project_summary(project):
+        conteo = project.tasks.values("status").annotate(total=Count("id"))
+        resumen = {"pendiente": 0, "en_progreso": 0, "completada": 0}
+        for fila in conteo:
+            resumen[fila["status"]] = fila["total"]
+        return resumen
