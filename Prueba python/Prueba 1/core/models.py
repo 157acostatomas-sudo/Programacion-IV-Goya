@@ -1,5 +1,5 @@
 from django.db import models
- 
+from django.conf import settings
  
 class Project(models.Model):
     name = models.CharField(max_length=150)
@@ -24,6 +24,11 @@ class Task(models.Model):
         ("en_progreso", "En progreso"),
         ("completada", "Completada"),
     ]
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name="tasks", null=True
+    )
  
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tasks")
     title = models.CharField(max_length=200)
