@@ -2,6 +2,7 @@ from datetime import date
 from rest_framework import serializers
 from .models import Project, Task, Tag
 from .services import HolidayService
+import nh3
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,6 +30,9 @@ class TaskSerializer(serializers.ModelSerializer):
         if value and value < date.today():
             raise serializers.ValidationError("La fecha límite no puede ser en el pasado.")
         return value
+
+    def validate_description(self, value):
+        return nh3.clean(value)
     
     def validate(self, data):
         # En un PATCH, "data" trae solo los campos enviados: lo que falte
