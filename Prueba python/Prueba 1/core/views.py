@@ -12,7 +12,6 @@ from .serializers_auth import RegisterSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from .permissions import IsProjectAdminOrReadOnly
-from .services import MembershipService
 from django.db import transaction
 from .models import Project, ProjectMembership
 from rest_framework.views import APIView
@@ -22,6 +21,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import SecurityLog
 from .throttles import LoginRateThrottle
+from .services import MembershipService, NotificationService, TaskService
 
 security_logger = logging.getLogger("security")
 
@@ -68,7 +68,8 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         self.check_project_admin(serializer.validated_data["project"])
-        serializer.save(owner=self.request.user)
+        task = serializer.save(owner=self.request.user)
+        NotificationService.notify_task_created(task)
 
     def perform_update(self, serializer):
         if "project" in serializer.validated_data:
