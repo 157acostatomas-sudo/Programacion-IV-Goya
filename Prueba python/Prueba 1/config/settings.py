@@ -35,6 +35,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -213,3 +214,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://taskflow-app.com",
 ]
+
+# --- Tiempo real (Clase 9) ---
+INSTALLED_APPS += ["channels"]
+ASGI_APPLICATION = "config.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
