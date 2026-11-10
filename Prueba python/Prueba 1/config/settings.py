@@ -226,3 +226,9 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# --- GraphQL (Clase 11) ---
+INSTALLED_APPS += ["graphene_django"]
+GRAPHENE = {
+    "SCHEMA": "config.schema.schema",
+}
