@@ -232,6 +232,7 @@ INSTALLED_APPS += ["corsheaders"]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://taskflow-app.com",
+    "http://127.0.0.1:5500",
 ]
 
 # --- Tiempo real (Clase 9) ---
