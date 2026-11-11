@@ -7,6 +7,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "Prueba python/Prueba 1"
     env:
       SECRET_KEY: clave-solo-para-los-tests-de-ci-0123456789
       DEBUG: "False"
