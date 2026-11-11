@@ -5,4 +5,4 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN SECRET_KEY=solo-para-construir python manage.py collectstatic --noinput
-CMD ["sh", "-c", "python manage.py migrate --noinput && daphne -b 0.0.0.0 -p 8000 config.asgi:application"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py ensure_superuser && daphne -b 0.0.0.0 -p 8000 config.asgi:application"]
